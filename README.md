@@ -19,7 +19,7 @@ Crypto Money is a Java-based application designed to manage a crypto wallet.
 ### Clone the repository
 
 ```sh
-git clone REPLACE_ME
+git clone https://github.com/diegodourado555/cryptomoney.git
 ```
 
 ## Docker
