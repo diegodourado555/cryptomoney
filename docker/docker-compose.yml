@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:latest
+    container_name: cryptomoney-db
+    environment:
+      POSTGRES_DB: cryptomoney
+      POSTGRES_USER: cryptouser
+      POSTGRES_PASSWORD: cryptopass
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init-db:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cryptouser -d cryptomoney"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

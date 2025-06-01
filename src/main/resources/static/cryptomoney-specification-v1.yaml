@@ -1,0 +1,204 @@
+openapi: 3.1.1
+info:
+  title: CryptoMoney API
+  version: 1.0.0
+  description: API for managing crypto wallets, assets, and profit simulation.
+
+servers:
+  - url: /api/v1
+
+paths:
+  /wallets:
+    post:
+      tags:
+        - wallet
+      summary: Create a new wallet by email
+      operationId: createWallet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WalletDTO'
+      responses:
+        '201':
+          description: Wallet created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletDTO'
+        '409':
+          description: Wallet already exists for this email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /wallets/{walletId}/assets:
+    post:
+      tags:
+        - wallet
+      summary: Add an asset to a wallet
+      operationId: addAssetToWallet
+      parameters:
+        - in: path
+          name: walletId
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssetDTO'
+      responses:
+        '201':
+          description: Asset added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetDTO'
+        '404':
+          description: Token price not found or wallet not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /wallets/{walletId}:
+    get:
+      tags:
+        - wallet
+      summary: Get wallet information with assets and total value
+      operationId: getWalletById
+      parameters:
+        - in: path
+          name: walletId
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Wallet info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletDTO'
+        '404':
+          description: Wallet not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /wallets/simulate/profit:
+    get:
+      tags:
+        - wallet
+      summary: Simulate wallet profit for today or a specific date
+      operationId: simulateProfit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfitSimulationRequestDTO'
+      responses:
+        '200':
+          description: Simulation result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfitSimulationResultDTO'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    UserDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+
+    WalletDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        email:
+          type: string
+          format: email
+          x-field-extra-annotation: "@NotNull(message = \"Email is required\")"
+        externalId:
+          type: string
+        userId:
+          type: integer
+          format: int64
+        total:
+          type: number
+          format: int64
+        assets:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetDTO'
+
+    AssetDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        symbol:
+          type: string
+        quantity:
+          type: number
+          format: double
+        price:
+          type: number
+          format: int64
+        value:
+          type: number
+          format: int64
+
+    ProfitSimulationRequestDTO:
+      type: object
+      properties:
+        assets:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetDTO'
+
+    ProfitSimulationResultDTO:
+      type: object
+      properties:
+        total:
+          type: number
+        bestAsset:
+          type: string
+        bestPerformance:
+          type: number
+        worstAsset:
+          type: string
+        worstPerformance:
+          type: number
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string

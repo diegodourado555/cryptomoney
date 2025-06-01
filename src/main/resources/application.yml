@@ -1,0 +1,48 @@
+spring:
+  jpa:
+    properties:
+      hibernate:
+        use_sql_comments: false
+        type:
+          descriptor:
+            sql:
+              basic: false
+    show-sql: false
+  datasource:
+    url: jdbc:postgresql://localhost:5432/cryptomoney
+    username: cryptouser
+    password: cryptopass
+    driver-class-name: org.postgresql.Driver
+  security:
+    oauth2:
+
+jakarta:
+  persistence:
+    jdbc:
+      url: ${spring.datasource.url}
+
+springdoc:
+    api-docs:
+      enabled: true
+    swagger-ui:
+      path: /swagger-ui.html
+      url: /cryptomoney-specification-v1.yaml
+      config-url: /v3/api-docs/swagger-config
+      disable-swagger-default-url: true
+
+management:
+  server:
+    port: 8081
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: always
+
+cryptomoney:
+  price-update-interval: 300000 #5 minutes in milliseconds
+  max-threads: 3
+  coin-cap-base-url: 'https://rest.coincap.io/v3'
+  api-key: 'aa807c5af2780458303b84c4996b9daff72735b95f98007b0774212ed47feba4'
